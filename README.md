@@ -182,6 +182,8 @@ The action outputs are signed fixed-point quantities interpreted by the hardware
 
 ### 4.1 Top-Level Blocks
 
+![NeuroDrive top-level blocks](./Top_Level_Blocks.png)
+
 ```
 Wishbone slave + control/status registers
         |
@@ -320,6 +322,8 @@ Most of the Caravel project area is allocated intentionally because:
 
 ### 5.2 Selected Memory Architecture
 
+![Memory allocation](./area_allocation.png)
+
 | Macro Use | Instance Count | Size Each | Total Capacity | Area Each | Total Area |
 |---|---|---|---|---|---|
 | Interleaved weight banks | 8 | 16 KB | 128 KB | 0.67 mm2 | 5.36 mm2 |
@@ -391,6 +395,8 @@ This floorplan is compatible with a macro-first hardening plan in OpenLane.
 
 ### 6.2 GPIO Allocation
 
+![GPIO allocations](./gpio_allocation.png)
+
 | GPIO | Direction | Function |
 |---|---|---|
 | `mprj_io[5:10]` | Output | `PWM_AH`, `PWM_AL`, `PWM_BH`, `PWM_BL`, `PWM_CH`, `PWM_CL` |
@@ -444,6 +450,9 @@ The board is not a production inverter. It is a **low-voltage post-silicon valid
 | explicit comparator fault path | provides a hard shutdown path outside the NN |
 
 ### 7.3 Planned Board Contents
+
+![Board plan](./board_plan.png)
+
 
 - Caravel module connector
 - low-voltage 3-phase inverter stage
