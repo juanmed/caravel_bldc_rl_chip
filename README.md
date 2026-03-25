@@ -22,7 +22,7 @@
 - [9. Implementation Schedule](#9-implementation-schedule)
 - [10. Marketplace IP Plan](#10-marketplace-ip-plan)
 - [11. Cost Estimate](#11-cost-estimate)
-- [12. Why This Scope Is Credible](#12-why-this-scope-is-credible)
+- [12. Feasibility Basis](#12-feasibility-basis)
 - [13. Risks and Mitigations](#13-risks-and-mitigations)
 - [14. References](#14-references)
 
@@ -38,7 +38,7 @@
 - a hardware safety envelope that can override the policy immediately,
 - and enough on-chip memory and trace capture to use most of the Caravel user area in a way that is technically justified.
 
-The design is intentionally **memory-dominated**. The Caravel user project wrapper exposes about **2.920 mm x 3.520 mm = 10.28 mm2** of area, and this proposal now targets roughly **8.7 to 9.7 mm2** of that space by using commercial SRAM macros from the ChipFoundry marketplace for weight bandwidth, trace capture, and bring-up buffers.
+The design is intentionally **memory-dominated**. The Caravel user project wrapper exposes about **2.920 mm x 3.520 mm = 10.28 mm2** of area, with roughly **8.7 to 9.7 mm2** targeted for logic and SRAM macros using the ChipFoundry marketplace memory options for weight bandwidth, trace capture, and bring-up buffers.
 
 ### Rev A Specifications
 
@@ -67,7 +67,7 @@ This project is a **reference application**, not a claim that RL will immediatel
 
 `offline RL training -> fixed-point export -> deterministic silicon inference -> safe low-voltage BLDC bench setup`
 
-The target is not maximum control bandwidth. The target is the largest policy network that still fits credibly inside Caravel, uses most of the available area, and remains implementable in an open-source flow.
+Priority is placed on maximizing policy size within the Caravel area while preserving a credible open-source implementation path, rather than on maximizing control-loop bandwidth.
 
 ---
 
@@ -146,7 +146,7 @@ The user logic performs:
 - PWM update timing,
 - and fault handling.
 
-This is the only partitioning that is realistic for deterministic motor control on Caravel.
+Deterministic motor-control timing on Caravel requires this partitioning, with the management core excluded from the real-time loop.
 
 ### 3.3 Control Abstraction
 
@@ -154,7 +154,7 @@ The policy does **not** command transistor gates directly. Rev A uses this signa
 
 `policy output[2:0] -> clamp + slew limit -> 3 signed phase duty commands -> complementary PWM generator -> 6 gate-driver inputs`
 
-This keeps power-stage safety in deterministic hardware.
+Power-stage safety remains in deterministic hardware.
 
 ### 3.4 Fixed State and Action Format
 
@@ -225,7 +225,7 @@ This organization keeps activation-memory bandwidth modest while making weight b
 
 ### 4.3 Neural-Network Sizing Feasibility
 
-The central sizing question for this proposal is whether a **10 hidden-layer, 90 neuron per layer** network is realistic in the available Caravel area.
+A central sizing question is whether a **10 hidden-layer, 90 neuron per layer** network is realistic in the available Caravel area.
 
 **Area conclusion**: yes.
 
@@ -250,7 +250,7 @@ This supports the following proposal targets:
 - **5 kHz policy rate** as the nominal first-silicon objective at 25 MHz
 - **10 kHz policy rate** as the stretch objective at 40 MHz
 
-That is the largest network size this proposal can defend cleanly without moving to a still wider weight bus or a more aggressive clock-only assumption.
+Under the stated clock and bus assumptions, larger networks would require either a wider weight bus or a more aggressive clock-only assumption.
 
 ### 4.4 Why This Network Size Is Credible
 
@@ -312,7 +312,7 @@ Weights are loaded only while PWM is disabled. The hardware refuses to arm motor
 
 ### 5.1 Why Memory Dominates the Area
 
-The proposal intentionally uses most of the Caravel project area for a reason:
+Most of the Caravel project area is allocated intentionally because:
 
 - the NN engine needs **bandwidth**, not just capacity,
 - the contest asks for a complete reference design, so traceability and diagnostics matter,
@@ -337,7 +337,7 @@ Each cycle, the 32-lane MAC array needs **32 signed 8-bit weights**. Eight 32-bi
 - 32 bytes/cycle,
 - 256 bits/cycle total.
 
-That is the minimum clean architecture for the chosen datapath.
+Eight 32-bit banks are the minimum clean architecture for the chosen datapath.
 
 ### 5.4 Estimated Total Area
 
@@ -348,7 +348,7 @@ That is the minimum clean architecture for the chosen datapath.
 | Routing, CTS, control logic margin | 0.5 to 0.9 mm2 |
 | **Total** | **8.73 to 9.73 mm2** |
 
-That uses roughly **85% to 95%** of the available Caravel user area while still leaving a narrow but usable routing margin.
+Estimated utilization is roughly **85% to 95%** of the available Caravel user area, leaving a narrow but usable routing margin.
 
 ### 5.5 Floorplan Intent
 
@@ -358,7 +358,7 @@ That uses roughly **85% to 95%** of the available Caravel user area while still 
 - PWM and safety placed near the GPIO edge,
 - SPI and sensor front-end placed near the sensor I/O cluster.
 
-This is a realistic macro-first hardening plan for OpenLane.
+This floorplan is compatible with a macro-first hardening plan in OpenLane.
 
 ---
 
@@ -418,7 +418,7 @@ Rev A baseline:
 - no mandatory PLL dependency,
 - and a stretch bring-up point at **40 MHz**.
 
-This keeps the baseline implementation conservative while still allowing a higher-rate experiment if timing and bring-up allow it.
+The baseline implementation remains conservative while still allowing a higher-rate experiment if timing and bring-up allow it.
 
 ---
 
@@ -460,7 +460,7 @@ The board includes a comparator-driven shutdown path that:
 - feeds `FAULT_N` into the ASIC for logging,
 - and independently disables the motor-driver enable path.
 
-This avoids treating the digital controller as the only safety barrier.
+The digital controller is therefore not the only safety barrier.
 
 ---
 
@@ -502,7 +502,7 @@ The verification plan does **not** claim full analog motor-plant proof. Instead 
 - safety-sequence coverage,
 - and a reproducible software golden model.
 
-That is the right level of rigor for this contest timeline.
+This verification scope matches the contest timeline.
 
 ---
 
@@ -574,7 +574,7 @@ That means the tapeout-ready phase is about **35 days** long. The plan must be n
 - board assembly results
 - post-silicon controller tuning across multiple motors
 
-This keeps the schedule consistent with the contest timeline instead of implying silicon availability before April 30, 2026.
+The schedule remains consistent with the contest timeline and does not imply silicon availability before April 30, 2026.
 
 ---
 
@@ -596,7 +596,7 @@ This keeps the schedule consistent with the contest timeline instead of implying
 
 ### 10.3 Why Marketplace SRAM Is Justified
 
-Without the commercial SRAM option, Rev A would have to shrink to a much smaller network and leave a large fraction of the Caravel area unused. Since this proposal assumes the organizers will cover the marketplace IP cost in the sponsored path, the SRAM option is the correct choice for:
+Without the commercial SRAM option, Rev A would have to shrink to a much smaller network and leave a large fraction of the Caravel area unused. In the sponsored path, the proposal assumes organizer coverage of the marketplace IP cost, making the SRAM option the correct choice for:
 
 - a more credible memory system,
 - higher confidence physical design,
@@ -649,7 +649,7 @@ The cost plan separates:
 
 ---
 
-## 12. Why This Scope Is Credible
+## 12. Feasibility Basis
 
 This proposal is based on practical lessons from previous Tiny Tapeout projects and from the Caravel contest rules.
 
@@ -684,7 +684,7 @@ That means the winning plan is not the broadest plan. It is the plan with the st
 
 `useful novelty / verification risk`
 
-The proposal therefore prioritizes a larger but still defensible network, fixed interfaces, and a macro-first physical plan.
+The resulting architecture prioritizes a larger but still defensible network, fixed interfaces, and a macro-first physical plan.
 
 ---
 
@@ -718,7 +718,7 @@ The proposal therefore prioritizes a larger but still defensible network, fixed 
    `openlane/user_project_wrapper/config.json`  
    `verilog/rtl/user_project_wrapper.v`
 
-### Tiny Tapeout precedents reviewed for this proposal
+### Tiny Tapeout precedents
 
 5. Tiny Tapeout chips index  
    https://tinytapeout.com/chips/
