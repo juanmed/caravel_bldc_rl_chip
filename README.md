@@ -7,6 +7,11 @@
 > ChipFoundry Reference Application Design Contest Proposal
 > March 26, 2026
 
+
+## Problem Statement
+
+FOC is the industry standard for BLDC motor control: reliable, efficient, and runs on $2 microcontrollers at 20+ kHz. But FOC is model-based and hand-tuned — it requires per-motor PI gain calibration, degrades when motor parameters drift with temperature or wear, and cannot adapt to changing loads without re-commissioning. RL eliminates these limitations. Hardware-validated studies show RL controllers matching or exceeding FOC in tracking accuracy while delivering 50% faster settling times, zero overshoot, and robustness to parameter variations without retuning. Meta-RL has generalized single policies across motor power classes from watts to kilowatts. The problem is deployment: RL policies train in Python on GPUs but have no dedicated hardware path to execute at deterministic motor-control rates. Researchers rely on general-purpose MCUs with variable inference latency or FPGA setups requiring HDL expertise orthogonal to the RL community. Physical AI in robotics — legged locomotion, dexterous manipulation, adaptive actuators — demands actuator-level intelligence executing learned policies in real time with hardware-enforced safety. A purpose-built, open-source RL inference chip for BLDC control would bridge the simulation-to-hardware gap and give the robotics community a standardized platform to move RL motor control from laboratory curiosity to deployable technology.
+
 ---
 
 ## Table of Contents
