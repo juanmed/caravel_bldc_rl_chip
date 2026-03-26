@@ -101,6 +101,8 @@ Priority is placed on maximizing policy size within the Caravel area while prese
 
 ### 3.1 System-Level View
 
+![System Level Diagram](./system_level_diagram.png)
+
 ```
 Host PC
   |
